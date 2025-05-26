@@ -6,7 +6,8 @@ This project is a Python-based tool designed for sending mass emails. It allows 
 
 ## Vısual
 
-![IMG_20250526_073109](https://github.com/user-attachments/assets/d055f202-cb47-45de-a4e3-e623e4a40070)
+![IMG_20250526_073109~2](https://github.com/user-attachments/assets/0118475f-e2e9-4095-9087-4d633509bcf3)
+
 
 
 ## Features
@@ -41,11 +42,11 @@ The `mail.txt`  file should be formatted as follows:
 - Each line should contain an entry in the format:  `email:smtp_key`
   
 **Example:**
-```
+`
 example1@example.com:smtp_key_1 
 example2@example.com:smtp_key_2 
 example3@example.com:smtp_key_3
-```
+`
 Make sure there are no extra spaces before or after the entries. Each email and SMTP key pair must be on its own line.
 
 ## Installation
@@ -53,13 +54,13 @@ Make sure there are no extra spaces before or after the entries. Each email and 
 + Clone the repository:
 
 ```
-git clone https://github.com/cyze-afresh/Mail-Bomber/
+git clone https://github.com/root-cyze/Bulk-EMail-Sender
 ```
 ```
-cd Mail-Bomber
+cd Bulk-EMail-Sender
 ```
 ```
-python main.py
+python sender.py
 ```
 
 ## Important Notes
