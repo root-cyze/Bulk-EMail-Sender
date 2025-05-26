@@ -40,12 +40,15 @@ Users must ensure that they read and understand the `mail.txt` file format befor
 The `mail.txt`  file should be formatted as follows:
 
 - Each line should contain an entry in the format:  `email:smtp_key`
+
   
-**Example:**
-`example1@example.com:smtp_key_1 
+**Example Mail.Txt Format:**
+``
+example1@example.com:smtp_key_1 
 example2@example.com:smtp_key_2 
 example3@example.com:smtp_key_3
-`
+``
+
 Make sure there are no extra spaces before or after the entries. Each email and SMTP key pair must be on its own line.
 
 ## Installation
