@@ -48,7 +48,7 @@ git clone https://github.com/root-cyze/Bulk-EMail-Sender
 ```
 cd Bulk-EMail-Sender
 ```
-````
+```
 python sender.py
 ```
 
