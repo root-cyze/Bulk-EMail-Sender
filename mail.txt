@@ -1,0 +1,3 @@
+example1@gmail.com:smtpkey1
+example2@gmail.com:smtpkey2
+example3@gmail.com:smtpkey3
