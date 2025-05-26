@@ -42,8 +42,7 @@ The `mail.txt`  file should be formatted as follows:
 - Each line should contain an entry in the format:  `email:smtp_key`
   
 **Example:**
-`
-example1@example.com:smtp_key_1 
+`example1@example.com:smtp_key_1 
 example2@example.com:smtp_key_2 
 example3@example.com:smtp_key_3
 `
