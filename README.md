@@ -52,7 +52,7 @@ cd Bulk-EMail-Sender
 python sender.py
 ```
 
-Important Notes
+## Important Notes
 
 Using multiple email accounts helps prevent spam filters from flagging your emails.
 
@@ -61,6 +61,6 @@ Make sure Python is installed and properly configured in your environment.
 Use this tool responsibly and only for legitimate purposes.
 
 
-Contribution
+## Contribution
 
 Contributions are welcome! Feel free to submit issues or pull requests to improve the project.
