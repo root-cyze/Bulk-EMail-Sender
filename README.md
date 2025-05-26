@@ -1,4 +1,4 @@
-# Mail Bomber
+# Bulk E Mail Sender
 
 ## Description
 
@@ -6,7 +6,7 @@ This project is a Python-based tool designed for sending mass emails. It allows 
 
 ## Vısual
 
-![Screenshot_2024-11-26-00-34-14-175_com termux-edit~2](https://github.com/user-attachments/assets/12f49b8c-12d6-45a3-977d-cd79295b35c9)
+![IMG_20250526_073109](https://github.com/user-attachments/assets/d055f202-cb47-45de-a4e3-e623e4a40070)
 
 
 ## Features
